@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Javascript</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.min.js"></script>
+</head>
+<body>
+    <script src="Tablero.js"></script>
+    <script>
+        
+        const MARGEN_TABLERO = 20;
+        let regulador_velocidad_teclas = 0;
+
+        /*
+            Función  setup nativa de p5.js, con la que podemos crear un canvas 
+            al que daremos estilos posteriormente.
+        */ 
+        function setup(){
+
+            createCanvas(900,600);//Tamaño en píxeles
+            /*
+                VARIABLE GLOBAL (por eso no lleva let, var ni const()
+            */
+            tablero = new Tablero();
+            pieza = new Pieza();
+            
+            /*Optimizar al máximo posible el canvas para optimizar los procesos*/
+            resizeCanvas(
+                tablero.ancho + (2*MARGEN_TABLERO), 
+                tablero.alto + (2*MARGEN_TABLERO));
+        }
+
+        /*
+            Función  draw es nativa de p5.js
+            Podemos dar instrucciones precisas de dibujo sobre el canvas
+            NOTA: 
+                Se ejecuta con una tasa de refresco muy alta, para el renderizado
+                de las imágenes, por lo que no se aconseja llamar a funciones
+                que no sean de dibujo: P.ej.: console.log()
+        */
+
+        function draw(){
+
+            background("lightgray");
+            tablero.dibujar();
+            pieza.dibujar();
+            keyEventsTetris();
+        }
+
+        //Función propia
+
+        function keyEventsTetris(){
+
+            /*
+                Como el ordenadorhace un procesamiento de 60-100 fotogramas por segundo
+                tenemos que regular la velocidad.
+            */
+            if(millis()-regulador_velocidad_teclas < 200){
+                return;
+            }
+            regulador_velocidad_teclas = millis(); //Se reinicia el contador;
+            if(keyIsDown(LEFT_ARROW)){
+                pieza.posicion.x --;
+            }
+            if(keyIsDown(RIGHT_ARROW)){
+                pieza.posicion.x ++;
+            }
+        }
+
+        class Pieza{
+
+            constructor(){
+                /*
+                    Dibujaremos respecto al tablero, no al canvas.
+                */
+                this.posicion = createVector(0,0);
+            }
+
+            dibujar(){
+                push()
+                fill("red")
+                let coord = tablero.coordenada(this.posicion.x, this.posicion.y);
+                rect(coord.x, coord.y, tablero.lado_celda);
+                pop();
+            }
+        }
+
+    </script>
+</body>
+</html>
